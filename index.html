@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DBMS & SQL FOUNDATIONS - KBC QUIZ</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: #060919; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+    
+    .bg-beam { position: fixed; inset: 0; background: radial-gradient(circle at 50% 30%, rgba(20, 50, 120, 0.6) 0%, rgba(6, 9, 25, 0.95) 75%); pointer-events: none; z-index: 0; }
+    
+    header { position: relative; z-index: 10; background: rgba(10, 18, 42, 0.95); border-bottom: 2px solid #ffd700; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+    .logo-title { font-size: 1.2rem; font-weight: 800; color: #ffd700; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+    .logo-sub { font-size: 0.75rem; color: #a0c0ff; font-weight: 500; }
+    .progress-box { flex: 1; max-width: 300px; margin: 0 20px; }
+    .progress-bar-bg { background: #101c38; border: 1px solid #ffd700; height: 12px; border-radius: 6px; overflow: hidden; }
+    .progress-bar-fill { background: linear-gradient(90deg, #ff9900, #ffd700); height: 100%; width: 5%; transition: width 0.3s; }
+    .q-count { color: #ffd700; font-weight: bold; font-size: 0.9rem; white-space: nowrap; }
+
+    .main-layout { position: relative; z-index: 10; display: grid; grid-template-columns: 260px 1fr 240px; gap: 15px; padding: 15px; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; }
+    
+    /* Left Control Deck */
+    .left-panel { background: rgba(12, 23, 52, 0.9); border: 1.5px solid rgba(255, 215, 0, 0.4); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); }
+    .panel-title { color: #ffd700; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; text-align: center; border-bottom: 1px solid rgba(255, 215, 0, 0.2); padding-bottom: 5px; }
+    .lifelines-container { display: flex; flex-direction: column; gap: 10px; }
+    .lifeline-btn { background: linear-gradient(180deg, #182e66 0%, #0a1533 100%); border: 1.5px solid #ffd700; border-radius: 25px; color: #fff; padding: 10px; font-weight: bold; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    .lifeline-btn:hover:not(:disabled) { background: linear-gradient(180deg, #254699 0%, #122252 100%); box-shadow: 0 0 12px rgba(255, 215, 0, 0.6); }
+    .lifeline-btn:disabled { opacity: 0.35; cursor: not-allowed; border-color: #555; }
+    .nav-container { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
+    .nav-btn { background: linear-gradient(180deg, #ff9900 0%, #cc7a00 100%); border: none; border-radius: 8px; color: #000; font-weight: bold; padding: 12px; cursor: pointer; text-align: center; transition: all 0.2s; }
+    .nav-btn:hover:not(:disabled) { filter: brightness(1.2); box-shadow: 0 0 12px rgba(255, 153, 0, 0.6); }
+    .nav-btn:disabled { background: #333; color: #777; cursor: not-allowed; }
+
+    /* Center Stage */
+    .center-stage { display: flex; flex-direction: column; gap: 15px; }
+    
+    .q-box { 
+      background: linear-gradient(180deg, #0e1e45 0%, #060e24 100%); 
+      border: 2px solid #ffd700; 
+      border-radius: 15px; 
+      padding: 22px; 
+      min-height: 120px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      text-align: center; 
+      font-size: 1.1rem; 
+      font-weight: 600; 
+      line-height: 1.5; 
+      color: #fff; 
+      box-shadow: 0 0 20px rgba(0, 100, 255, 0.3), inset 0 0 15px rgba(255, 215, 0, 0.1); 
+      clip-path: polygon(3% 0%, 97% 0%, 100% 50%, 97% 100%, 3% 100%, 0% 50%);
+    }
+
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    
+    .opt-btn { 
+      background: linear-gradient(180deg, #0f204a 0%, #071028 100%); 
+      border: 1.5px solid #ffaa00; 
+      border-radius: 25px; 
+      padding: 12px 20px; 
+      color: #fff; 
+      font-size: 0.9rem; 
+      font-weight: 500; 
+      cursor: pointer; 
+      text-align: left; 
+      display: flex; 
+      align-items: center; 
+      transition: all 0.2s; 
+      clip-path: polygon(4% 0%, 96% 0%, 100% 50%, 96% 100%, 4% 100%, 0% 50%);
+    }
+    .opt-btn:hover:not(:disabled) { border-color: #ffffff; background: linear-gradient(180deg, #183273 0%, #0d1e4a 100%); box-shadow: 0 0 12px rgba(255, 215, 0, 0.5); }
+    .opt-prefix { color: #ffd700; font-weight: bold; margin-right: 10px; font-size: 1rem; }
+    
+    .opt-btn.correct { background: linear-gradient(180deg, #008000 0%, #004d00 100%) !important; border-color: #00ff00 !important; color: #fff !important; box-shadow: 0 0 20px #00ff00; }
+    .opt-btn.incorrect { background: linear-gradient(180deg, #cc0000 0%, #800000 100%) !important; border-color: #ff3333 !important; color: #fff !important; animation: shake 0.4s; }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .explanation-card { background: rgba(10, 20, 45, 0.95); border: 1px solid #ffd700; border-radius: 10px; padding: 15px; display: none; }
+    .exp-status { font-weight: bold; font-size: 1rem; margin-bottom: 5px; }
+    .exp-status.correct { color: #00ff00; }
+    .exp-status.incorrect { color: #ff4d4d; }
+    .exp-rule { color: #ffd700; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; }
+    .exp-text { font-size: 0.85rem; color: #d0e0ff; line-height: 1.4; }
+
+    /* Right Panel Prize Ladder */
+    .right-panel { background: rgba(12, 23, 52, 0.9); border: 1.5px solid rgba(255, 215, 0, 0.4); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; max-height: 600px; overflow-y: auto; }
+    .prize-list { display: flex; flex-direction: column-reverse; gap: 3px; }
+    .prize-item { display: flex; justify-content: space-between; padding: 4px 10px; font-size: 0.78rem; border-radius: 4px; color: #a0a0a0; font-weight: 600; }
+    .prize-item.active { background: #ff9900; color: #000; font-weight: bold; box-shadow: 0 0 10px #ff9900; }
+    .prize-item.safe-haven { color: #ffd700; font-weight: bold; }
+    .prize-item.completed { color: #50e3c2; }
+
+    /* Modals */
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 100; padding: 20px; }
+    .modal-content { background: #0c1734; border: 2px solid #ffd700; border-radius: 15px; padding: 25px; max-width: 500px; width: 100%; text-align: center; box-shadow: 0 0 25px rgba(255, 215, 0, 0.4); }
+    .modal-title { color: #ffd700; font-size: 1.3rem; margin-bottom: 15px; font-weight: bold; }
+    .close-btn { background: #ff9900; border: none; color: #000; font-weight: bold; padding: 8px 20px; border-radius: 5px; margin-top: 15px; cursor: pointer; }
+
+    /* Results */
+    .result-card { display: none; background: #0c1734; border: 2px solid #ffd700; border-radius: 15px; padding: 30px; text-align: center; max-width: 600px; margin: 40px auto; box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); }
+    .res-title { color: #ffd700; font-size: 1.8rem; font-weight: bold; margin-bottom: 10px; }
+    .res-score { font-size: 1.2rem; color: #fff; margin-bottom: 20px; }
+    .res-badge { display: inline-block; padding: 8px 20px; background: #ff9900; color: #000; font-weight: bold; border-radius: 20px; margin-bottom: 20px; }
+
+    @media (max-width: 900px) {
+      .main-layout { grid-template-columns: 1fr; }
+      .right-panel { display: none; }
+      .options-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-beam"></div>
+
+  <header>
+    <div>
+      <div class="logo-title">DBMS & SQL CHALLENGE</div>
+      <div class="logo-sub">CLASS 12 COMPUTER SCIENCE / INFORMATICS PRACTICES</div>
+    </div>
+    <div class="progress-box">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+    </div>
+    <div class="q-count" id="q-counter">Question 1 / 20</div>
+  </header>
+
+  <div class="main-layout" id="quiz-stage">
+    
+    <!-- Left Panel -->
+    <div class="left-panel">
+      <div class="panel-title">LIFELINES</div>
+      <div class="lifelines-container">
+        <button class="lifeline-btn" id="life-5050" onclick="use5050()">⚡ 50:50</button>
+        <button class="lifeline-btn" id="life-poll" onclick="usePoll()">📊 AUDIENCE POLL</button>
+        <button class="lifeline-btn" id="life-expert" onclick="useExpert()">🎓 ASK EXPERT</button>
+      </div>
+
+      <div class="panel-title" style="margin-top: 15px;">NAVIGATION</div>
+      <div class="nav-container">
+        <button class="nav-btn" id="prev-btn" onclick="prevQuestion()" disabled>← PREVIOUS</button>
+        <button class="nav-btn" id="next-btn" onclick="nextQuestion()" disabled>NEXT QUESTION →</button>
+      </div>
+    </div>
+
+    <!-- Center Stage -->
+    <div class="center-stage">
+      <div class="q-box" id="question-text">Loading Question...</div>
+
+      <div class="options-grid">
+        <button class="opt-btn" onclick="selectOption(0)"><span class="opt-prefix">A:</span><span id="opt0"></span></button>
+        <button class="opt-btn" onclick="selectOption(1)"><span class="opt-prefix">B:</span><span id="opt1"></span></button>
+        <button class="opt-btn" onclick="selectOption(2)"><span class="opt-prefix">C:</span><span id="opt2"></span></button>
+        <button class="opt-btn" onclick="selectOption(3)"><span class="opt-prefix">D:</span><span id="opt3"></span></button>
+      </div>
+
+      <div class="explanation-card" id="exp-card">
+        <div class="exp-status" id="exp-status"></div>
+        <div class="exp-rule" id="exp-rule"></div>
+        <div class="exp-text" id="exp-text"></div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+      <div class="panel-title" style="margin-bottom: 8px;">PRIZE LADDER</div>
+      <div class="prize-list" id="prize-tree"></div>
+    </div>
+
+  </div>
+
+  <!-- Results Screen -->
+  <div class="result-card" id="result-screen">
+    <div class="res-title">🏆 QUIZ COMPLETED</div>
+    <div class="res-score" id="res-score-text">You answered 0 / 20 correctly</div>
+    <div class="res-badge" id="res-level">Level: Analyzing...</div>
+    <div>
+      <button class="nav-btn" onclick="restartQuiz()">RESTART QUIZ</button>
+    </div>
+  </div>
+
+  <!-- Lifeline Modal -->
+  <div class="modal" id="lifeline-modal">
+    <div class="modal-content">
+      <div class="modal-title" id="modal-title">Lifeline</div>
+      <div id="modal-body" style="font-size: 0.95rem; line-height: 1.5; color: #d0e0ff;"></div>
+      <button class="close-btn" onclick="closeModal()">CLOSE</button>
+    </div>
+  </div>
+
+  <script>
+    const prizes = [
+      "₹1,000", "₹2,000", "₹3,000", "₹5,000", "₹10,000 [SAFE]",
+      "₹20,000", "₹40,000", "₹80,000", "₹1,60,000", "₹3,20,000 [SAFE]",
+      "₹6,40,000", "₹12,50,000", "₹25,00,000", "₹50,00,000", "₹1 Crore [SAFE]",
+      "₹2 Crore", "₹3 Crore", "₹5 Crore", "₹7 Crore", "₹10 Crore [SAFE]"
+    ];
+
+    const safeHavens = [4, 9, 14, 19];
+
+    const questions = [
+      { q: "Which of the following is a primary disadvantage of a traditional file-processing system that a DBMS overcomes?", opts: ["Inability to store structured records", "Data redundancy and inconsistency", "Incompatibility with text editors", "Requirement of high-level programming languages"], ans: 1, topic: "DBMS Concepts", exp: "File-processing systems frequently duplicate data across multiple files, leading to redundancy and inconsistency during updates." },
+      { q: "In the relational model, a table or relation is conceptually defined as a collection of:", opts: ["Schemas", "Tuples", "Datatypes", "Databases"], ans: 1, topic: "Relational Model", exp: "A relation corresponds to a table, which is fundamentally an unordered set of tuples (rows)." },
+      { q: "In relational database terminology, what is an 'attribute'?", opts: ["A row of data", "A column or named field in a relation", "A unique key constraint", "The complete database catalog"], ans: 1, topic: "Relational Terminology", exp: "Attributes represent the properties or characteristics modeled in a relation, corresponding to table columns." },
+      { q: "A single row of data representing a single record in a relation is termed a:", opts: ["Domain", "Tuple", "Degree", "Schema"], ans: 1, topic: "Relational Terminology", exp: "A tuple represents an individual record (row) within a relational table." },
+      { q: "In a database table, what do we call the set of all possible valid values that a column is allowed to contain?", opts: ["Domain", "Primary Key", "Tuple", "Cardinality"], ans: 0, topic: "Relational Concepts", exp: "A domain is the set of permissible, valid values from which an attribute (column) gets its data." },
+      { q: "If a relation STUDENT has 6 columns and 45 rows, what are its degree and cardinality?", opts: ["Degree: 45, Cardinality: 6", "Degree: 6, Cardinality: 45", "Degree: 6, Cardinality: 6", "Degree: 45, Cardinality: 45"], ans: 1, topic: "Degree & Cardinality", exp: "Degree is the total number of attributes (columns = 6), and cardinality is the total number of tuples (rows = 45)." },
+      { q: "If two new rows are inserted into a table and no columns are added or removed, how do degree and cardinality change?", opts: ["Degree increases by 2; cardinality remains unchanged", "Degree remains unchanged; cardinality increases by 2", "Both degree and cardinality increase by 2", "Both degree and cardinality remain unchanged"], ans: 1, topic: "Degree & Cardinality", exp: "Adding rows increases cardinality. Degree (number of columns) remains static unless schema alterations occur." },
+      { q: "Which SQL sublanguage includes commands used to create, alter, and delete database structures?", opts: ["DML (Data Manipulation Language)", "DCL (Data Control Language)", "DDL (Data Definition Language)", "TCL (Transaction Control Language)"], ans: 2, topic: "SQL Sublanguages", exp: "DDL commands (CREATE, ALTER, DROP, TRUNCATE) manage the structure or schema of database objects." },
+      { q: "Which of the following SQL statements belongs to DDL?", opts: ["UPDATE", "SELECT", "ALTER", "INSERT"], ans: 2, topic: "DDL Commands", exp: "ALTER modifies the structure of an existing database table, making it a DDL command." },
+      { q: "Which command is classified as a Data Manipulation Language (DML) statement?", opts: ["CREATE TABLE", "DROP TABLE", "UPDATE", "ALTER TABLE"], ans: 2, topic: "DML Commands", exp: "UPDATE modifies existing records within a table, classifying it as DML." },
+      { q: "What is the fundamental operational difference between CHAR(10) and VARCHAR(10) when storing the string 'DATA'?", opts: ["CHAR(10) stores 4 characters and frees 6 bytes; VARCHAR(10) pads with 6 spaces.", "CHAR(10) pads 6 trailing spaces taking 10 bytes; VARCHAR(10) stores only 4 characters plus length overhead.", "CHAR can store alphanumeric values, whereas VARCHAR stores only variable-length alphabets.", "VARCHAR(10) cannot accept strings shorter than 10 characters."], ans: 1, topic: "SQL Data Types", exp: "CHAR is fixed-length and right-pads with spaces to the declared size. VARCHAR is variable-length and allocates only the storage required for the actual string." },
+      { q: "Which data type is most appropriate for storing an employee's fixed 10-digit Permanent Account Number (PAN)?", opts: ["VARCHAR(10)", "CHAR(10)", "FLOAT", "INT"], ans: 1, topic: "SQL Data Types", exp: "For values with an invariable, fixed length (like a 10-character alphanumeric PAN), CHAR(10) avoids dynamic length byte overhead and represents fixed formatting accurately." },
+      { q: "What is the standard ISO format for inserting values into a column defined with the SQL DATE data type?", opts: ["'DD-MM-YYYY'", "'MM-DD-YYYY'", "'YYYY-MM-DD'", "'YYYY-DD-MM'"], ans: 2, topic: "SQL Data Types", exp: "The ANSI/ISO standard format for SQL date literals is 'YYYY-MM-DD'." },
+      { q: "To store a student's percentage score of 87.65, which data type should be selected?", opts: ["INT", "VARCHAR(5)", "FLOAT", "DATE"], ans: 2, topic: "SQL Data Types", exp: "FLOAT handles floating-point numeric values with fractional components, whereas INT truncates decimals." },
+      { q: "Which command permanently deletes an entire table and removes its schema definition from the database dictionary?", opts: ["DELETE TABLE", "REMOVE TABLE", "DROP TABLE", "TRUNCATE TABLE"], ans: 2, topic: "DDL Commands", exp: "DROP TABLE deletes both the stored records and the schema definition. DELETE and TRUNCATE remove only data rows while leaving the table schema intact." },
+      { q: "Which statement best characterizes SQL?", opts: ["Purely procedural programming language", "Declarative, non-procedural query language", "Object-oriented compiled programming language", "Assembly-level database driver protocol"], ans: 1, topic: "SQL Concepts", exp: "SQL is a non-procedural/declarative language: users specify what data to retrieve or manipulate rather than how to locate it algorithmically." },
+      { q: "If table ORDERS has 4 columns and 0 rows, its degree and cardinality are:", opts: ["Degree: 0, Cardinality: 0", "Degree: 4, Cardinality: 0", "Degree: 0, Cardinality: 4", "Degree: 4, Cardinality: Undefined"], ans: 1, topic: "Degree & Cardinality", exp: "The schema still defines 4 attributes (Degree = 4), while an empty table contains zero tuples (Cardinality = 0)." },
+      { q: "What happens if you try to insert the string 'DATABASE' into a column defined as VARCHAR(5)?", opts: ["The database pads it with spaces.", "It raises a value/string truncation error.", "The column dynamically expands its capacity to 8.", "It converts the characters to numeric equivalents."], ans: 1, topic: "SQL Constraints", exp: "Inserting a string longer than the declared length constraint causes an error or string truncation depending on strict SQL modes." },
+      { q: "Which statement is classified as DML?", opts: ["INSERT INTO", "CREATE VIEW", "ALTER DATABASE", "DROP INDEX"], ans: 0, topic: "DML Commands", exp: "INSERT INTO adds data rows into an existing relation, falling under Data Manipulation Language." },
+      { q: "Which key uniquely identifies each row in a table and prevents duplicate records?", opts: ["Foreign Key", "Primary Key", "Composite Attribute", "Secondary Key"], ans: 1, topic: "Keys & Integrity", exp: "A Primary Key consists of one or more columns that uniquely identify each record (row) in a table, ensuring entity integrity." }
+    ];
+
+    let currentQ = 0;
+    let userAnswers = new Array(20).fill(null);
+    let lifelinesUsed = { '5050': false, 'poll': false, 'expert': false };
+
+    function initQuiz() {
+      buildPrizeTree();
+      loadQuestion();
+    }
+
+    function buildPrizeTree() {
+      const tree = document.getElementById('prize-tree');
+      tree.innerHTML = '';
+      prizes.forEach((p, idx) => {
+        const item = document.createElement('div');
+        item.className = `prize-item ${safeHavens.includes(idx) ? 'safe-haven' : ''}`;
+        item.id = `prize-${idx}`;
+        item.innerHTML = `<span>Q${idx+1}</span> <span>${p}</span>`;
+        tree.appendChild(item);
+      });
+    }
+
+    function loadQuestion() {
+      const qData = questions[currentQ];
+      document.getElementById('q-counter').innerText = `Question ${currentQ + 1} / 20`;
+      document.getElementById('progress-fill').style.width = `${((currentQ + 1) / 20) * 100}%`;
+      document.getElementById('question-text').innerText = `${currentQ + 1}. ${qData.q}`;
+
+      for (let i = 0; i < 4; i++) {
+        const btn = document.querySelectorAll('.opt-btn')[i];
+        document.getElementById(`opt${i}`).innerText = qData.opts[i];
+        btn.className = 'opt-btn';
+        btn.style.display = 'flex';
+        btn.disabled = false;
+      }
+
+      document.querySelectorAll('.prize-item').forEach(el => el.classList.remove('active', 'completed'));
+      for (let i = 0; i < currentQ; i++) {
+        document.getElementById(`prize-${i}`).classList.add('completed');
+      }
+      document.getElementById(`prize-${currentQ}`).classList.add('active');
+      document.getElementById(`prize-${currentQ}`).scrollIntoView({ block: 'nearest' });
+
+      const expCard = document.getElementById('exp-card');
+      if (userAnswers[currentQ] !== null) {
+        showFeedback(userAnswers[currentQ]);
+      } else {
+        expCard.style.display = 'none';
+      }
+
+      document.getElementById('prev-btn').disabled = (currentQ === 0);
+      document.getElementById('next-btn').disabled = (userAnswers[currentQ] === null);
+      if (currentQ === 19 && userAnswers[19] !== null) {
+        document.getElementById('next-btn').innerText = "VIEW RESULT →";
+      } else {
+        document.getElementById('next-btn').innerText = "NEXT QUESTION →";
+      }
+    }
+
+    function selectOption(index) {
+      if (userAnswers[currentQ] !== null) return;
+      userAnswers[currentQ] = index;
+      showFeedback(index);
+      document.getElementById('next-btn').disabled = false;
+    }
+
+    function showFeedback(selectedIdx) {
+      const qData = questions[currentQ];
+      const btns = document.querySelectorAll('.opt-btn');
+
+      btns.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === qData.ans) btn.classList.add('correct');
+        if (idx === selectedIdx && selectedIdx !== qData.ans) btn.classList.add('incorrect');
+      });
+
+      const expCard = document.getElementById('exp-card');
+      const statusEl = document.getElementById('exp-status');
+      if (selectedIdx === qData.ans) {
+        statusEl.innerText = "✓ CORRECT ANSWER!";
+        statusEl.className = "exp-status correct";
+      } else {
+        statusEl.innerText = `✗ INCORRECT (Correct: ${String.fromCharCode(65 + qData.ans)})`;
+        statusEl.className = "exp-status incorrect";
+      }
+
+      document.getElementById('exp-rule').innerText = `Concept: ${qData.topic}`;
+      document.getElementById('exp-text').innerText = qData.exp;
+      expCard.style.display = 'block';
+    }
+
+    function nextQuestion() {
+      if (currentQ < 19) {
+        currentQ++;
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQ > 0) {
+        currentQ--;
+        loadQuestion();
+      }
+    }
+
+    function use5050() {
+      if (lifelinesUsed['5050'] || userAnswers[currentQ] !== null) return;
+      lifelinesUsed['5050'] = true;
+      document.getElementById('life-5050').disabled = true;
+
+      const qData = questions[currentQ];
+      let removed = 0;
+      const btns = document.querySelectorAll('.opt-btn');
+      for (let i = 0; i < 4; i++) {
+        if (i !== qData.ans && removed < 2) {
+          btns[i].style.display = 'none';
+          removed++;
+        }
+      }
+    }
+
+    function usePoll() {
+      if (lifelinesUsed['poll'] || userAnswers[currentQ] !== null) return;
+      lifelinesUsed['poll'] = true;
+      document.getElementById('life-poll').disabled = true;
+
+      const qData = questions[currentQ];
+      let poll = [10, 10, 10, 10];
+      poll[qData.ans] = 70;
+
+      showModal("Audience Poll Results", `
+        Option A: ${poll[0]}%<br>
+        Option B: ${poll[1]}%<br>
+        Option C: ${poll[2]}%<br>
+        Option D: ${poll[3]}%
+      `);
+    }
+
+    function useExpert() {
+      if (lifelinesUsed['expert'] || userAnswers[currentQ] !== null) return;
+      lifelinesUsed['expert'] = true;
+      document.getElementById('life-expert').disabled = true;
+
+      const qData = questions[currentQ];
+      showModal("Ask The Expert", `<b>Expert Advice:</b> "Focus on standard database terminology: <b>${qData.topic}</b>. Distinguish clearly between data manipulation and structure definition."`);
+    }
+
+    function showModal(title, body) {
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-body').innerHTML = body;
+      document.getElementById('lifeline-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('lifeline-modal').style.display = 'none';
+    }
+
+    function showResults() {
+      document.getElementById('quiz-stage').style.display = 'none';
+      document.getElementById('result-screen').style.display = 'block';
+
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === questions[idx].ans) correctCount++;
+      });
+
+      const percentage = (correctCount / 20) * 100;
+      document.getElementById('res-score-text').innerText = `You answered ${correctCount} / 20 questions correctly (${percentage.toFixed(0)}%)`;
+
+      let level = "MORE PRACTICE REQUIRED";
+      if (percentage >= 90) level = "EXCELLENT";
+      else if (percentage >= 75) level = "VERY GOOD";
+      else if (percentage >= 60) level = "GOOD";
+      else if (percentage >= 40) level = "NEEDS PRACTICE";
+
+      document.getElementById('res-level').innerText = `PREPARATION LEVEL: ${level}`;
+    }
+
+    function restartQuiz() {
+      currentQ = 0;
+      userAnswers.fill(null);
+      lifelinesUsed = { '5050': false, 'poll': false, 'expert': false };
+      document.querySelectorAll('.lifeline-btn').forEach(btn => btn.disabled = false);
+      document.getElementById('quiz-stage').style.display = 'grid';
+      document.getElementById('result-screen').style.display = 'none';
+      loadQuestion();
+    }
+
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
